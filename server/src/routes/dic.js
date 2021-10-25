@@ -1,0 +1,58 @@
+const express = require('express') 
+const DicRouter = express.Router() 
+const Dic = require("../models/Dic");
+
+DicRouter.get('/', async (req, res) => { 
+    // res.send('all dic list') 
+    const dics = await Dic.find()
+    //console.log(dics) 
+    res.json({status:200, dics})
+}) 
+
+DicRouter.get('/:id', (req, res) => { 
+    //res.send(`dic ${req.params.id}`) 
+    Dic.findById(req.params.id, (err, dic) => { 
+        if(err) throw err; 
+        res.json({ status: 200, dic}) 
+    })    
+})
+
+// DicRouter.post('/', (req, res) => { 
+//     res.send(`dic ${req.body.name} created`) 
+// })
+
+DicRouter.put('/:id', (req, res) => { 
+   // res.send(`dic ${req.params.id} updated`) 
+   Dic.findByIdAndUpdate(req.params.id, req.body, {new: true}, (err, dic) => { 
+       if(err) throw err; 
+       res.json({ status: 204, msg: `dic ${req.params.id} updated in db !`, dic}) 
+    })   
+})
+
+DicRouter.delete('/:id', (req, res) => { 
+    // res.send(`dic ${req.params.id} updated`) 
+    Dic.findByIdAndRemove(req.params.id, (err, dic) => { 
+        if(err) throw err; 
+        res.json({ status: 204, msg: `dic ${req.params.id} removed in db !`}) 
+     })   
+ })
+
+DicRouter.post('/', (req, res) => { 
+    console.log(`r_word: ${req.body.r_word}`) 
+    Dic.findOne({ r_word: req.body.r_word, r_word: req.body.r_link }, async (err, dic) => { // 중복체크 
+        if(err) throw err; 
+        if(!dic){ // 데이터베이스에서 해당 사전을 조회하지 못한 경우 
+            const newDic = new Dic(req.body); 
+            await newDic.save().then( () => { 
+                res.json({ status: 201, msg: 'new dic created in db !', newDic}) 
+            }) 
+        }else{ // 생성하려는 사전과 같은 이름이고 아직 끝내지 않은 사전이 이미 데이터베이스에 존재하는 경우 
+            const msg = 'this dic already exists in db !' 
+            console.log(msg) 
+            res.json({ status: 204, msg}) 
+        } 
+    }) 
+})
+
+
+module.exports = DicRouter
