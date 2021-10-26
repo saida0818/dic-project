@@ -6,7 +6,8 @@ var mongoose = require('mongoose')
 var routes = require('./src/routes')
 
 var corsOptions = { // CORS 옵션
-    origin: 'http://localhost:3000',
+    //origin: 'http://localhost:3000',
+    origin: '*',
     credentials: true
 }
 const CONNECT_URL = 'mongodb://localhost:27017/kor_dic_db'
@@ -18,6 +19,7 @@ mongoose.connect(CONNECT_URL, { // Mongo DB 서버 연결
 
 
 app.use(cors(corsOptions)) // CORS 설정
+app.use(express.urlencoded({ extended: false }))
 app.use(express.json()) // request body 파싱
 app.use(logger('tiny')) // Logger 설정
 

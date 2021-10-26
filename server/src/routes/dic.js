@@ -2,6 +2,7 @@ const express = require('express')
 const DicRouter = express.Router() 
 const Dic = require("../models/Dic");
 
+/*
 DicRouter.get('/', async (req, res) => { 
     // res.send('all dic list') 
     const dics = await Dic.find()
@@ -16,6 +17,23 @@ DicRouter.get('/:id', (req, res) => {
         res.json({ status: 200, dic}) 
     })    
 })
+*/
+
+DicRouter.route('/(:word)?').get( async (req, res) => {
+    let words = []
+    const { word } = req.params
+    console.log(req.params.word)
+
+    if(word !== undefined && word !== "undefined"){
+        //res.send("특정단어")
+        words = await Dic.find({ r_word: word}).sort({r_word:1,r_seq:1})
+    }else{
+        //res.send("전체단어")
+        words = await Dic.find().sort({r_word:1,r_seq:1})
+    }
+    res.json({ status:200, words})
+})
+
 
 // DicRouter.post('/', (req, res) => { 
 //     res.send(`dic ${req.body.name} created`) 
@@ -39,7 +57,7 @@ DicRouter.delete('/:id', (req, res) => {
 
 DicRouter.post('/', (req, res) => { 
     console.log(`r_word: ${req.body.r_word}`) 
-    Dic.findOne({ r_word: req.body.r_word, r_word: req.body.r_link }, async (err, dic) => { // 중복체크 
+    Dic.findOne({ r_word: req.body.r_word, r_link: req.body.r_link }, async (err, dic) => { // 중복체크 
         if(err) throw err; 
         if(!dic){ // 데이터베이스에서 해당 사전을 조회하지 못한 경우 
             const newDic = new Dic(req.body); 
