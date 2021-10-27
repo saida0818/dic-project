@@ -18,6 +18,18 @@ DicRouter.get('/:id', (req, res) => {
     })    
 })
 */
+DicRouter.route('/auto/(:word)?').get( async (req, res) => {
+    let words = []
+    const { word } = req.params
+    console.log(req.params.word)
+
+    if(word !== undefined && word !== "undefined"){
+        words = await Dic.distinct('r_word', { r_word: new RegExp('^'+word)})
+    }else{
+        words = ['none']
+    }
+    res.json({ status:200, words})
+})
 
 DicRouter.route('/(:word)?').get( async (req, res) => {
     let words = []
@@ -33,7 +45,6 @@ DicRouter.route('/(:word)?').get( async (req, res) => {
     }
     res.json({ status:200, words})
 })
-
 
 // DicRouter.post('/', (req, res) => { 
 //     res.send(`dic ${req.body.name} created`) 
