@@ -24,7 +24,12 @@ DicRouter.route('/auto/(:word)?').get( async (req, res) => {
     console.log(req.params.word)
 
     if(word !== undefined && word !== "undefined"){
-        words = await Dic.distinct('r_word', { r_word: new RegExp('^'+word)})
+        try{
+            //words = await Dic.distinct('r_word', { r_word: { $regex: `^${word}`}})
+            words = await Dic.distinct('r_word', { r_word: new RegExp('^'+word)})
+        }catch(e){ 
+            console.log(e) 
+        }             
     }else{
         words = ['none']
     }
@@ -38,10 +43,30 @@ DicRouter.route('/(:word)?').get( async (req, res) => {
 
     if(word !== undefined && word !== "undefined"){
         //res.send("특정단어")
-        words = await Dic.find({ r_word: word}).sort({r_word:1,r_seq:1})
+        try{
+            //words = await Dic.find({ r_word: word}).sort({r_word:1,r_seq:1})
+            //words = await Dic.find({ r_word: { $regex: `^${word}`}}) // 검색어로 시작하는 단어
+            //words = await Dic.find({ r_word: { $regex: `${word}$`}}) // 검색어로 끝나는 단어
+            //words = await Dic.find({ r_des: { $regex: `${word}`}}) // 검색어로 포함된 단어
+            words = await Dic.find({
+                $or: [
+                    {r_word: { $regex: `${word}`}},
+                    {r_des: { $regex: `${word}`}}
+                ]
+            }).sort({r_word:1,r_seq:1}) // sort : -1=최신순(내림), 1=과거순(오름)
+            .limit(6) // 조회갯수 설정
+
+            //words = await Dic.find({ r_des: {$in:[{ $regex: '법규'},{ $regex: '계속'}]}})
+        }catch(e){ 
+            console.log(e) 
+        }             
     }else{
         //res.send("전체단어")
-        words = await Dic.find().sort({r_word:1,r_seq:1})
+        try{
+            words = await Dic.find().sort({r_word:1,r_seq:1})
+        }catch(e){ 
+            console.log(e) 
+        }            
     }
     res.json({ status:200, words})
 })
