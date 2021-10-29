@@ -31,7 +31,7 @@ DicRouter.route('/auto/(:word)?').get( async (req, res) => {
             console.log(e) 
         }             
     }else{
-        words = ['none']
+        //words = ['none']
     }
     res.json({ status:200, words})
 })
