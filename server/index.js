@@ -10,13 +10,14 @@ var corsOptions = { // CORS 옵션
     origin: '*',
     credentials: true
 }
-const CONNECT_URL = 'mongodb://localhost:27017/kor_dic_db'
+// const CONNECT_URL = 'mongodb://localhost:27017/kor_dic_db'
+const CONNECT_URL = 'mongodb+srv://saida0818:1q2w3e@kor-dic-data.t4ydf.mongodb.net/kor_dic_db?retryWrites=true&w=majority'
+
 mongoose.connect(CONNECT_URL, { // Mongo DB 서버 연결
     useNewUrlParser: true,
     useUnifiedTopology: true
 }).then(() => console.log("mongodb connected ..."))
   .catch(e => console.log(`failed to connect mongodb: ${e}`))
-
 
 app.use(cors(corsOptions)) // CORS 설정
 app.use(express.urlencoded({ extended: false }))
@@ -36,6 +37,6 @@ app.use( (err, req, res, next) => { // 서버 내부 오류 처리
     console.error(err.stack)
     res.status(500).send("something is broken on server !")
 })
-app.listen(5000, () => { // 5000 포트로 서버 오픈
+app.listen(process.env.PORT || 5000, () => { // 5000 포트로 서버 오픈
     console.log('server is running on port 5000 ...')
 })
